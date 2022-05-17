@@ -6,10 +6,9 @@ import { Link } from "react-router-dom";
 
 function ProductList() {
   const [product, setProduct] = useState([]);
+  const [data, setdata] = useState();
   const [isLoading, setIsLoading] = useState(false);
-
   const BASE_URL = "https://fakestoreapi.com";
-
   useEffect(() => {
     getAlldata();
   }, []);
@@ -19,10 +18,18 @@ function ProductList() {
     axios.get(`${BASE_URL}/products?limit=10`).then((res) => {
       console.log(res.data);
       setProduct(res.data);
+      localStorage.setItem('data',JSON.stringify(res.data))
       setIsLoading(false);
     });
   };
-
+   const filterData =(id) =>{
+    const newproduct =  product.filter((el)=>{
+        return el.id !== id
+      })
+      console.log("before delete=>",product)
+      setProduct(newproduct)
+      console.log("after delete=>",product)
+   }
   const deleteProduct = (id) => {
     console.log("id=>", id);
     setIsLoading(true);
@@ -31,7 +38,9 @@ function ProductList() {
       console.log(res.data);
       if (res.status === 200) {
         setIsLoading(false);
+        filterData(id);
         toast.success("data has been deleted successfully");
+
       } else {
         setIsLoading(false);
         toast.error("something wrong");
