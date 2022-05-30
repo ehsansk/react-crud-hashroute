@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
-import Loader from "./loder";
+import Loader from "../loder";
 import { Link } from "react-router-dom";
 
-function ProductList() {
+function SinglePage() {
+    const [title,setTitle] = useState();
+    const [description,setdescription] = useState();
+    const [price,setprice] = useState();
+    const [category,setcategory] = useState();
+    const [image,setimage] = useState('');
+  const formdata ={title,description,price,category,image}
+
+
   const [product, setProduct] = useState([]);
   const [data, setdata] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const BASE_URL = "https://fakestoreapi.com";
+  // console.log('product =>',product)
   useEffect(() => {
     getAlldata();
   }, []);
@@ -26,9 +35,9 @@ function ProductList() {
     const newproduct =  product.filter((el)=>{
         return el.id !== id
       })
-      console.log("before delete=>",product)
+    //   console.log("before delete=>",product)
       setProduct(newproduct)
-      console.log("after delete=>",product)
+    //   console.log("after delete=>",product)
    }
   const deleteProduct = (id) => {
     console.log("id=>", id);
@@ -49,28 +58,72 @@ function ProductList() {
     getAlldata();
   };
 
+// modal functionality
+
+const submitForm = (e)=>{
+    e.preventDefault();
+    
+  console.log('data=>',formdata)
+ 
+  setIsLoading(true)
+  axios.post('https://fakestoreapi.com/products',formdata,{'Content-Type':'application/json' }).then(res=>{
+     console.log(res);
+     console.log(res.data);
+     setIsLoading(false)
+     if(res.status === 200){
+       toast.success('Data Submitted Successfully')
+       const resId =Math.floor(Math.random(res.data.id) *100); 
+       const resData= res.data
+       product.push(res.data)
+  console.log('product =>',product)
+
+        resetForm();
+     }
+     if(res.status === 413){
+       toast.error('file size too large')
+     }
+  }).catch(err=>{
+     setIsLoading(false)
+     console.log(err);
+  })
+}
+
+const handleChange =(e) =>{
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(e.target.files[0], "UTF-8");
+    fileReader.onload = (e) => {
+    //   console.log("e.target.result", e.target.result);
+      setimage(e.target.result);
+    };
+  }
+  const resetForm =()=>{
+    setTitle('');
+    setdescription('');
+    setprice('');
+    setcategory('');
+    setimage('')
+}
+
   return (
     <>
       {isLoading === true && <Loader />}
       <ToastContainer />
       <h3 className="bg-info text-white py-3">Product List</h3>
       <div className="text-right mb-3 mr-3">
-        <Link to="/addItem" className="btn btn-primary ml-auto">
+        {/* <Link to="/addItem" className="btn btn-primary ml-auto" >
           Add Item
-        </Link>
-      </div>
-      <div className="text-right mb-3 mr-3">
-        <Link to="/singlepage" className="btn btn-primary ml-auto">
-          Single Page 
-        </Link>
+        </Link> */}
+        <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#staticBackdrop">
+  add Item
+</button>
       </div>
       <div className="container-fluid">
         <div className="wrapper">
           <div className="row">
             {product?.length > 0 &&
-              product.map((el) => {
+              product.map((el,index) => {
                 return (
-                  <div key={el?.id} className="col-md-3 mb-3">
+                  <div key={index} className="col-md-3 mb-3">
                     <div className="card product-card">
                       <img
                         src={el?.image}
@@ -83,13 +136,17 @@ function ProductList() {
                           <p>
                             <strong>Cate : {el?.category}</strong>
                           </p>
+                          {el?.rating?.rate &&(
                           <p>Rate : {el?.rating?.rate}</p>
+                          )}
                         </div>
                         <div className="d-flex justify-content-between">
                           <p>
                             <strong>Price : {el?.price}</strong>
                           </p>
+                          {el?.rating?.count &&(
                           <p>Stock : {el?.rating?.count}</p>
+                          )}
                         </div>
                         <div className="action">
                           <div className="d-flex justify-content-between">
@@ -138,8 +195,72 @@ function ProductList() {
           </div>
         </div>
       </div>
+
+{/* modal */}
+  {/* <Modal  product={product} setProduct={setProduct} /> */}
+{/* modal end */}
+<div
+        className="modal fade"
+        id="staticBackdrop"
+        data-backdrop="static"
+        data-keyboard="false"
+        tabIndex="-1"
+        aria-labelledby="staticBackdropLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="staticBackdropLabel">
+                Modal title
+              </h5>
+              <button
+                type="button"
+                className="btn btn-close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                X
+              </button>
+            </div>
+            <div className="modal-body">
+            <form onSubmit={submitForm}>
+              <div className="row p-4 text-left">
+              <div className="form-group  col-12">
+                    <label>Title</label>
+                    <input type="text"  name="title" className="form-control" onChange={(e)=>setTitle(e?.target?.value)}  />
+                 </div>
+                 <div className="form-group  col-12">
+                    <label>Description</label>
+                    <input type="text" name="description"  className="form-control" onChange={(e)=>setdescription(e?.target?.value)} />
+                 </div>
+                 <div className="form-group  col-12">
+                    <label>Price</label>
+                    <input type="number"  name="price" className="form-control" onChange={(e)=>setprice(e?.target?.value)}  />
+                 </div>
+                 <div className="form-group  col-12">
+                    <label>Category</label>
+                    <input type="text" name="category"  className="form-control" onChange={(e)=>setcategory(e?.target?.value)}  />
+                 </div>
+                 <div className="form-group col-md-12 col-12">
+                    <label>Image</label>
+                    <input type="file" name="image"  className="form-control" onChange={handleChange}  accept="image/*" />
+                 </div>
+                 <div className='form-group  col-12'>
+                  <button type="submit"   className="btn btn-primary">Submit</button>
+                 </div>
+                 </div>
+              </form>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+
+
+      
     </>
   );
 }
 
-export default ProductList;
+export default SinglePage;

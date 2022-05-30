@@ -52,8 +52,8 @@ function AddItem() {
  });
 
  
- const submitForm = (data)=>{
-   console.log(data)
+ const submitForm = (formdata)=>{
+   console.log(formdata)
    setIsLoading(true)
    axios.post('https://fakestoreapi.com/products',formdata).then(res=>{
       console.log(res);
@@ -89,27 +89,27 @@ function AddItem() {
               <div className="row p-4">
               <div className="form-group col-md-6 col-12">
                     <label>Title</label>
-                    <input type="text"  className="form-control" {...register('title')}  />
+                    <input type="text" name="title" className="form-control" {...register('title')}  />
                     <p className='error-msg'>{errors.title?.message}</p>
                  </div>
                  <div className="form-group col-md-6 col-12">
                     <label>Description</label>
-                    <input type="text"  className="form-control" {...register('description')}  />
+                    <input type="text" name="description"  className="form-control" {...register('description')}  />
                     <p className='error-msg'>{errors.description?.message}</p>
                  </div>
                  <div className="form-group col-md-6 col-12">
                     <label>Price</label>
-                    <input type="text"  className="form-control" {...register('price')}  />
+                    <input type="number" name="price" className="form-control" {...register('price')}  />
                     <p className='error-msg'>{errors.price?.message}</p>
                  </div>
                  <div className="form-group col-md-6 col-12">
                     <label>Category</label>
-                    <input type="text"  className="form-control" {...register('category')}  />
+                    <input type="text" name="category" className="form-control" {...register('category')}  />
                     <p className='error-msg'>{errors.category?.message}</p>
                  </div>
                  <div className="form-group col-md-12 col-12">
                     <label>Image</label>
-                    <input type="file"  className="form-control" {...register('image')}  />
+                    <input type="file" name="image" className="form-control" {...register('image')}  />
                     <p className='error-msg'>{errors.image?.message}</p>
                  </div>
                  <div className='form-group col-md-6 col-12'>

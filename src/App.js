@@ -5,6 +5,7 @@ import { HashRouter,Route,Routes } from 'react-router-dom';
 import AddItem from './components/addItem';
 import Editproduct from './components/Editproduct';
 import ProductList from './components/ProductList';
+import SinglePage from './components/singlepagecrud/SinglePage';
 
 
 function App() {
@@ -16,9 +17,10 @@ function App() {
       <Route exact path='/' element={<ProductList />} />
       <Route path='/addItem' element={<AddItem />} />
       <Route path='/editproduct/:id' element={<Editproduct />} />
+      <Route path='/singlepage' element={<SinglePage />} />
       </Routes>
   </HashRouter>
-     
+
     </div>
   );
 }
